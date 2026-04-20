@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSITS Member Registration — HCCCI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2044;
+    --blue: #1a3a6b;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --gold: #c9a84c;
+    --surface: #f8f9fc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --border-focus: #2563eb;
+    --text: #0f172a;
+    --muted: #64748b;
+    --success: #16a34a;
+    --error: #dc2626;
+    --error-bg: #fef2f2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: var(--navy);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(37,99,235,0.15);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.1);
+  }
+  .header-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .school-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 5px 14px 5px 5px;
+    margin-bottom: 1.25rem;
+  }
+  .badge-dot {
+    width: 22px; height: 22px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--navy);
+  }
+  .school-badge span { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 0.02em; }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.25rem);
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .header h1 span { color: var(--gold); }
+  .header-sub { font-size: 14px; color: rgba(255,255,255,0.55); }
+  .header-pills {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 1.25rem;
+  }
+  .pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* Progress */
+  .progress-bar-wrap {
+    background: var(--navy);
+    padding: 0 0 1.5rem;
+  }
+  .progress-track {
+    max-width: 720px; margin: 0 auto; padding: 0 1.5rem;
+  }
+  .steps {
+    display: flex; gap: 0; align-items: center;
+  }
+  .step {
+    display: flex; align-items: center; gap: 8px; flex: 1;
+    font-size: 12px; color: rgba(255,255,255,0.4);
+    transition: color 0.3s;
+  }
+  .step.active { color: rgba(255,255,255,0.9); }
+  .step.done { color: var(--gold); }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+    transition: background 0.3s, color 0.3s;
+  }
+  .step.active .step-num { background: var(--accent); color: #fff; }
+  .step.done .step-num { background: var(--gold); color: var(--navy); }
+  .step-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); margin: 0 4px; }
+
+  /* Main */
+  .main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* Sections */
+  .form-section { display: none; }
+  .form-section.active { display: block; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    line-height: 1.6;
+  }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Fields */
+  .field { margin-bottom: 1.1rem; }
+  .field:last-child { margin-bottom: 0; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  label .req { color: var(--error); margin-left: 2px; }
+  label .hint { font-weight: 400; color: var(--muted); font-size: 11px; margin-left: 4px; }
+
+  input[type=text],
+  input[type=email],
+  input[type=number],
+  select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  input:focus, select:focus {
+    border-color: var(--border-focus);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  input.error, select.error {
+    border-color: var(--error);
+    background: var(--error-bg);
+  }
+  select:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Radio group for section */
+  .radio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .radio-opt {
+    position: relative;
+  }
+  .radio-opt input[type=radio] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+  }
+  .radio-opt label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin: 0;
+    text-align: center;
+    padding: 0 8px;
+  }
+  .radio-opt input[type=radio]:checked + label {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .radio-opt label:hover {
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  /* Address preview */
+  .address-preview {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #0369a1;
+    display: none;
+  }
+  .address-preview.show { display: block; }
+  .address-preview strong { display: block; font-size: 11px; color: #7dd3fc; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Nav buttons */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.75rem;
+    gap: 12px;
+  }
+  .btn {
+    height: 46px;
+    padding: 0 24px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-back {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-back:hover { border-color: var(--text); color: var(--text); }
+  .btn-next {
+    background: var(--accent);
+    color: #fff;
+    margin-left: auto;
+  }
+  .btn-next:hover { background: #1d4ed8; transform: translateY(-1px); }
+  .btn-next:active { transform: translateY(0); }
+  .btn-submit {
+    background: var(--navy);
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+    height: 52px;
+    font-size: 15px;
+    border-radius: 14px;
+    margin-top: 1.75rem;
+  }
+  .btn-submit:hover { background: var(--blue); transform: translateY(-1px); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* Review card */
+  .review-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .review-item:last-child { border-bottom: none; }
+  .review-key { font-size: 12px; color: var(--muted); flex-shrink: 0; width: 140px; }
+  .review-val { font-size: 14px; color: var(--text); font-weight: 500; text-align: right; }
+
+  /* Success */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .success-screen.show { display: block; }
+  .success-icon {
+    width: 72px; height: 72px;
+    background: #dcfce7;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 32px;
+  }
+  .success-screen h2 {
+    font-size: 1.5rem; font-weight: 600;
+    color: var(--text); margin-bottom: 0.5rem;
+  }
+  .success-screen p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+  /* Error message */
+  .err-msg {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 4px;
+    display: none;
+  }
+  .err-msg.show { display: block; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--navy); color: #fff;
+    padding: 12px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 500;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 540px) {
+    .row2, .row3 { grid-template-columns: 1fr; }
+    .radio-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="school-badge">
+      <div class="badge-dot">H</div>
+      <span>Holy Child Central Colleges, Inc.</span>
+    </div>
+    <h1>PSITS <span>Member</span> Registration</h1>
+    <p class="header-sub">College of Computer Studies · Surallah Campus · A.Y. 2025–2026</p>
+    <div class="header-pills">
+      <span class="pill">Region XII — SOCCSKSARGEN</span>
+      <span class="pill">BSIT &amp; ACT Programs</span>
+      <span class="pill">S.Y. 2025–2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-track">
+    <div class="steps" id="stepsEl">
+      <div class="step active" data-step="0">
+        <div class="step-num">1</div>
+        <span>Personal</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="1">
+        <div class="step-num">2</div>
+        <span>Academic</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2">
+        <div class="step-num">3</div>
+        <span>Address</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">
+        <div class="step-num">4</div>
+        <span>Review</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2>Registration Submitted!</h2>
+    <p>Thank you for registering as a PSITS member.<br>Your information has been recorded successfully.<br><br>
+    <span style="color:var(--accent);font-weight:500;">You may now close this page.</span></p>
+  </div>
+
+  <!-- STEP 1: Personal Info -->
+  <div class="form-section active" id="step0">
+    <div class="section-label">Step 1 of 4</div>
+    <div class="section-title">Personal Information</div>
+    <div class="section-desc">Please enter your full legal name as it appears on your school records.</div>
+
+    <div class="card">
+      <div class="card-title">Full Name</div>
+      <div class="row3">
+        <div class="field">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" id="lastName" placeholder="e.g. Dela Cruz" autocomplete="family-name">
+          <div class="err-msg" id="err-lastName">Required</div>
+        </div>
+        <div class="field">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" id="firstName" placeholder="e.g. Juan" autocomplete="given-name">
+          <div class="err-msg" id="err-firstName">Required</div>
+        </div>
+        <div class="field">
+          <label>Middle Name <span class="hint">(optional)</span></label>
+          <input type="text" id="middleName" placeholder="e.g. Santos">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Contact Details</div>
+      <div class="row2">
+        <div class="field">
+          <label>School ID Number <span class="req">*</span></label>
+          <input type="text" id="schoolId" placeholder="e.g. 202400123" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+          <div class="err-msg" id="err-schoolId">Enter a valid numeric School ID</div>
+        </div>
+        <div class="field">
+          <label>Mobile Number <span class="req">*</span></label>
+          <input type="text" id="mobile" placeholder="e.g. 09XXXXXXXXX" maxlength="11">
+          <div class="err-msg" id="err-mobile">Enter a valid 11-digit number</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>School Email Address <span class="req">*</span></label>
+        <input type="email" id="email" placeholder="e.g. jdelacruz2024@hccci.edu.ph" autocomplete="email">
+        <div class="err-msg" id="err-email">Enter a valid @hccci.edu.ph email</div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn btn-next" onclick="goNext(0)">Next — Academic Info →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Academic -->
+  <div class="form-section" id="step1">
+    <div class="section-label">Step 2 of 4</div>
+    <div class="section-title">Academic Information</div>
+    <div class="section-desc">Select your current program, year level, and section.</div>
+
+    <div class="card">
+      <div class="card-title">Program · Year · Section</div>
+      <div class="field">
+        <label>Select your section <span class="req">*</span></label>
+        <div class="radio-grid" id="sectionRadios">
+          <div class="radio-opt"><input type="radio" name="section" id="s1" value="BSIT 1-1"><label for="s1">BSIT 1-1</label></div>
+          <div class="radio-opt"><input type="radio" name="section" id="s2" value="BSIT 1-2"><label for="s2">BSIT 1-2</label></div>
+          <div class="radio-opt"><input type="radio" name="section" id="s3" value="BSIT 1-1W"><label for="s3">BSIT 1-1W</label></div>
+          <div class="radio-opt"><input type="radio" name="section" id="s4" value="BSIT 2-1"><label for="s4">BSIT 2-1</label></div>
+          <div class="radio-opt"><input type="radio" name="section" id="s5" value="BSIT 2-1W"><label for="s5">BSIT 2-1W</label></div>
+          <div class="radio-opt"><input type="radio" name="section" id="s6" value="BSIT 3-1W"><label for="s6">BSIT 3-1W</label></div>
+          <div class="radio-opt"><input type="radio" name="section" id="s7" value="ACT 1-1W"><label for="s7">ACT 1-1W</label></div>
+          <div class="radio-opt"><input type="radio" name="section" id="s8" value="ACT 2-1W"><label for="s8">ACT 2-1W</label></div>
+        </div>
+        <div class="err-msg" id="err-section">Please select your section</div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="goBack(1)">← Back</button>
+      <button class="btn btn-next" onclick="goNext(1)">Next — Address →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Address -->
+  <div class="form-section" id="step2">
+    <div class="section-label">Step 3 of 4</div>
+    <div class="section-title">Permanent Address</div>
+    <div class="section-desc">Select your province, then municipality, then barangay from the dropdowns.</div>
+
+    <div class="card">
+      <div class="card-title">Street / Purok</div>
+      <div class="field">
+        <label>Purok / Street / House No. <span class="hint">(optional)</span></label>
+        <input type="text" id="street" placeholder="e.g. Purok 3, Blk 2 Lot 5">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Location</div>
+      <div class="field">
+        <label>Province <span class="req">*</span></label>
+        <select id="province" onchange="loadMunicipalities()">
+          <option value="">— Select province —</option>
+        </select>
+        <div class="err-msg" id="err-province">Please select a province</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Municipality / City <span class="req">*</span></label>
+          <select id="municipality" onchange="loadBarangays()" disabled>
+            <option value="">— Select municipality —</option>
+          </select>
+          <div class="err-msg" id="err-municipality">Please select a municipality</div>
+        </div>
+        <div class="field">
+          <label>Barangay <span class="req">*</span></label>
+          <select id="barangay" onchange="updatePreview()" disabled>
+            <option value="">— Select barangay —</option>
+          </select>
+          <div class="err-msg" id="err-barangay">Please select a barangay</div>
+        </div>
+      </div>
+      <div class="address-preview" id="addrPreview">
+        <strong>Address Preview</strong>
+        <span id="addrText"></span>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="goBack(2)">← Back</button>
+      <button class="btn btn-next" onclick="goNext(2)">Review Submission →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Review -->
+  <div class="form-section" id="step3">
+    <div class="section-label">Step 4 of 4</div>
+    <div class="section-title">Review Your Information</div>
+    <div class="section-desc">Please check all details before submitting. Click Back to make changes.</div>
+
+    <div class="card">
+      <div class="card-title">Personal</div>
+      <div id="reviewPersonal"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Academic</div>
+      <div id="reviewAcademic"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Address</div>
+      <div id="reviewAddress"></div>
+    </div>
+
+    <button class="btn btn-submit" id="submitBtn" onclick="submitForm()">
+      ✓ &nbsp; Submit PSITS Registration
+    </button>
+
+    <div class="nav-row" style="margin-top:0.75rem;">
+      <button class="btn btn-back" onclick="goBack(3)">← Back to Address</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIGURATION — Replace with your Google Apps Script URL
+// ============================================================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx06a5IsQz9JA6C_8lA0R3vI7oLmDlpmewOpojIol_ZjLako8EelXZCQ-MTXCZDQ1fezQ/exec';
+
+// ============================================================
+// ADDRESS DATA — Region XII (SOCCSKSARGEN) — PhilAtlas / PSGC
+// ============================================================
+const addressData = {
+  "Cotabato (North Cotabato)": {
+    "Alamada": ["Bao","Barangiran","Camansi","Dado","Guiling","Kitacubong","Lower Dado","Macabasa","Malitubog","Mapurok","Mirasol","Pacao","Paruayan","Pigcawaran","Polayagan","Rangayen","Raradangan"],
+    "Aleosan": ["Bagolibas","Dunguan","F. Cajelo","Kiyawon","Luanan","New Leon","New Panay","Pagangan","Poblacion","San Mateo","Tapodoc","Tapol","Tomado","Upper Mingading","Lower Mingading","San Antonio","D'Lotilla"],
+    "Antipas": ["B. Cadungon","Camutan","Canaan","Datu Agod","Dolores","Kiyaab","Luhong","Magsaysay","Malangag","Malatad","Malire","New Pontevedra","Poblacion"],
+    "Arakan": ["Allab","Anapolon","Badiangon","Binoongan","Dallag","Datu Ladayon","Datu Matangkil","Doroluman","Gambodes","Ganatan","Greenfield","Kabalantian","Katipunan","Kinawayan","Kulaman Valley","Lanao Kuran","Libertad","Makalangot","Malibatuan","Maria Caridad","Meocan","Naje","Napalico","Salasang","San Miguel","Santo Niño","Sumalili","Tumanding"],
+    "Banisilan": ["Banisilan Poblacion","Busaon","Capayangan","Carugmanan","Gastay","Kalawaig","Kiaring","Malagap","Malinao","Miguel Macasarte","Pantar","Paradise","Pinamulaan","Poblacion II","Puting-bato","Solama","Thailand","Tinimbacan","Tumbao-Camalig","Wadya"],
+    "Carmen": ["Aroman","Bentangan","Cadiis","Carpenter Hill","Colambutan","Dagupan","Damawato","Kadigasan","Kamada","Katanawan","Kimadzil","Kitubod","Langogan","Lanoon","Liliongan","Luhong","Maligang","Manubuan","Nasapian","Poblacion","Villarica"],
+    "Kabacan": ["Bangilan","Camalig","Dagupan","Katidtuan","Kayaga","Kiwanan","Lamalama","Lanao","Magsaysay","Nanga-an","Osias","Pagildan","Pedtad","Pisan","Poblacion","Presbitero","Simbuhay"],
+    "Kidapawan City": ["Amas","Amazion","Balabag","Balindog","Binoligan","Birada","Gayola","Ginatilan","Ilomavis","Indangan","Junction","Kalaisan","Katipunan","Lanao","Libertad","Linangkob","Luvimin","Macabolig","Magsaysay","Malinan","Manongol","Mateo","Mua-an","New Bohol","Nuangan","Onica","Paco","Padre Burgos","Perez","Poblacion","San Isidro","San Roque","Santo Niño","Sibawan","Sikitan","Singao","Sudapin","Sumbac","Upper Manongol","Landan"],
+    "Libungan": ["Baguer","Barongis","Batiocan","Cabaruyan","Calubian","Campo Uno","Colambutan","Crossing","Dagupan","Kanapulo","Katipunan","Kilada","Linangkob","Maluao","New Culasi","Poblacion","Sinakulay","Sinapangan","Ulamian","Upper Dagupan"],
+    "Magpet": ["Amabel","Bagontapay","Bantac","Basak","Bongolanon","Bulatukan","Datu Celo","Don Panaca","Gubatan","Ilian","Imba","Inac","Kamada","Kinarum","Kisante","Lower Kisante","Mahongcog","Managa","New Cebu","New Rizal","Pangao-an","Poblacion","Salat","San Vicente","Santa Felomina","Temporan","Tonganon","Tubak","Upper Kisante","Tag-Ulo","Binay","Doles"],
+    "Makilala": ["Batasan","Bato","Biangan","Buenavista","Bulakanon","Cabilao","Concepcion","Dagupan","Garsika","Guangan","Indangan","Jose Rizal","Katipunan","Kisante","Lamiran","Libertad","Luayon","Luna Norte","Luna Sur","Malabuan","Malasila","Malili","Malungon","New Baguio","New Bulatukan","New Cebu","New Israel","Old Bulatukan","Poblacion","Rodero","Saguing","Saint Peter","San Vicente","Santa Felomina","Santo Niño","Sinkatulan","Taluntalunan","Batasan Hills"],
+    "Matalam": ["Arakan","Bangbang","Bato","Central Bangbang","Dalapitan","Dungos","Ilian","Kamansi","Kibalang","Kilada","Kinilis","Lampayan","Landan","Linao","Manubuan","Marbel","Minapan","Natutungan","New Alimodian","New Cebu","New Pandan","Patadon","Poblacion","Salvacion","San Miguel","San Vicente","Sarakan","Taculen","Ulamian","Kilada II","Central Poblacion","Central Taculen","Manobo","Old Poblacion"],
+    "Midsayap": ["Bagoenied","Baliki","Bual Norte","Bual Sur","Bulanan","Central Glad","Daladap","Dungguan","Kakar","Kapinpilan","Kimagango","Kiwara","Kuaken","Lao-Lao","Lower Glad","Luhong","Kadingilan","Malamote","Malinao","Midpapan","Milaya","Mudseng","Nabalawag","Natutungan","Nuangan","Olandang","Palongoguen","Patot","Poblacion A","Poblacion B","Poblacion C","Poblacion D","Poblacion E","Poblacion F","Poblacion G","Poblacion H","Sadaan","Salunayan","Sambulawan","San Pedro","Tugal","Tumbras","Upper Glad","San Mateo"],
+    "M'lang": ["Bagontapay","Bialong","Buayan","Calunasan","Concepcion","Dagong","Dalipe","Dungos","Giling","Kanaan","La Suerte","Langkong","Lao-Lao","Lepaga","Liboo","Luhong","Mabini","Malayan","Malingao","Manga","New Antique","New Cebu","New Isabela","New Lagao","New Rizal","Palma","Poblacion","Pulabato","San Jose","San Isidro","San Pedro","Sangat","Taculen","Tibao","Tinanan","Titulok","Tupi"],
+    "Pigcawayan": ["Bagumbayan","Banaga","Batang","Bulucanon","Cabpangi","Central Balimbing","Central Malamote","Datu Binasing","Gindulongan","Kabalantian","Katipunan","Kidama","Kulaman","Lanao","Libungan Torreta","Malamote","Manarapan","New Culasi","Paidu Pulangi","Payong-Payong","Poblacion","Polayagan","Rajah Muda","Simsiman","South Manuangan","Talitay","Upper Manuangan","North Manuangan"],
+    "Pikit": ["Bairing","Baliki","Buliok","Central Pikit","Dalingap","Gokotan","Inug-ug","Kakar","Kalacakan","Kalaisan","Kalaongon","Kiat","Ladtingan","Nabalawag","Paidu Pulangi","Panicupan","Poblacion","Rajah Muda","Takepan","Talitay"],
+    "President Roxas": ["Alegria","Balacayon","Banali","Batasan","Datu Indang","Datu Sanday","Dunguan","Gama","Idaoman","Kabalantian","Kablon","Katipunan","Kibudtungan","Kisandal","Magbok","Malibatuan","New Panay","Poblacion","Rajah Muda","Sagcungan","San Jose","San Vicente","Sinawingan","Talitay","Tuael"],
+    "Tulunan": ["Bacong","Batulawan","Biarong","Buenavista","Daig","F. Cajelo","Galidan","Genoveva","Kanaan","La Esperanza","Lamitan","Magbok","Magsaysay","Minapan","New Culasi","New Panay","Paraiso","Poblacion","San Fernando","San Isidro","Santa Cruz","Santa Filomena","Santo Niño","Telafas","Tinongcop","Tuburan","Ungap","Bituan","Damawato"]
+  },
+  "South Cotabato": {
+    "Banga": ["Benitez","Cabudian","Cabuling","Cinco","Derilon","El Nonok","Improgo Village","Kusan","Lam-apos","Lamba","Lambingi","Lampari","Liwanay","Malaya","Punong Grande","Rang-ay","Reyes","Rizal","Rizal Poblacion","San Jose","San Vicente","Yangco Poblacion"],
+    "Koronadal City": ["Assumption","Avanceña","Cacub","Caloocan","Carpenter Hill","Concepcion","Esperanza","General Paulino Santos","Mabini","Magsaysay","Mambucal","Morales","Namnama","New Pangasinan","Paraiso","Rotonda","San Isidro","San Jose","San Roque","Santa Cruz","Santo Niño","Sarabia","Zone I","Zone II","Zone III","Zone IV","Zulueta"],
+    "Lake Sebu": ["Bacdulong","Denlag","Halilan","Hanoon","Klubi","Lake Lahit","Lamcade","Lamdalag","Lamfugon","Lamlahak","Lower Maculan","Luhib","Ned","Poblacion","Siluton","Takunel","Talisay","Tasiman","Upper Maculan"],
+    "Norala": ["Benigno Aquino, Jr.","Dumaguil","Esperanza","Kibid","Lapuz","Liberty","Lopez Jaena","Matapol","Poblacion","Puti","San Jose","San Miguel","Simsiman","Tinago"],
+    "Polomolok": ["Bentung","Cannery Site","Crossing Palkan","Glamang","Kinilis","Klinan 6","Koronadal Proper","Lam-Caliaf","Landan","Lapu","Lumakil","Magsaysay","Maligo","Pagalungan","Palkan","Poblacion","Polo","Rubber","Silway 7","Silway 8","Sulit","Sumbakil","Upper Klinan"],
+    "Santo Niño": ["Ambalgan","Guinsang-an","Katipunan","Manuel Roxas","Panay","Poblacion","Sajaneba","San Isidro","San Vicente","Teresita"],
+    "Surallah": ["Buenavista","Canahay","Centrala","Colongulo","Dajay","Duengas","Lambontong","Lamian","Lamsugod","Libertad","Little Baguio","Moloy","Naci","Talahik","Tubiala","Upper Sepaka","Veterans"],
+    "T'Boli": ["Aflek","Afus","Basag","Datal Bob","Desawo","Dlanag","Edwards","Kematu","Laconon","Lambangan","Lambuling","Lamhako","Lamsalome","Lemsnolon","Maan","Malugong","Mongocayo","New Dumangas","Poblacion","Salacafe","Sinolon","T'bolok","Talcon","Talufo","Tudok"],
+    "Tampakan": ["Albagan","Buto","Danlag","Kipalbig","Lambayong","Lampitak","Liberty","Maltana","Palo","Poblacion","Pula-bato","San Isidro","Santa Cruz","Tablu"],
+    "Tantangan": ["Bukay Pait","Cabuling","Dumadalig","Libas","Magon","Maibo","Mangilala","New Cuyapo","New Iloilo","New Lambunao","Poblacion","San Felipe","Tinongcop"],
+    "Tupi": ["Acmonan","Bololmala","Bunao","Cebuano","Crossing Rubber","Kablon","Kalkam","Linan","Lunen","Miasong","Palian","Poblacion","Polonuling","Simbo","Tubeng"]
+  },
+  "Sultan Kudarat": {
+    "Bagumbayan": ["Bai Saripinang","Balankan","Balong","Daluga","Kalaisan","Kalamongay","Kenram","Kolambog","Kudanding","Lagandang","Laging Haring","Langgal","Mabuhay","Maganoy","Maligang","Mangelen","Marbel","Miraflor","Nalus","Olas","Poblacion","Simbol","Sumilil"],
+    "Columbio": ["Bantangan","Datablao","Eday","Itan","Kalaisan","Katanawan","Linan","Luhong","Malegdeg","Marbel","Matulas","Morado","Narbalan","Pisan","Poblacion","Sinapulan"],
+    "Esperanza": ["Ala","Daladap","Dukay","Guiamalia","Ilian","Kangkong","Kalaisan","Kablakan","Laguinding","Map","Margues","New Panay","Nuling","Palanggalan","Pamantingan","Panadtaban","Poblacion","Salabaca","Saliao","Tual"],
+    "Isulan": ["Bambad","Bual","D'Lotilla","Dansuli","Impao","Kalawag I","Kalawag II","Kalawag III","Kenram","Kolambog","Lagandang","Laguilayan","Mapantig","New Pangasinan","Poblacion","Sampao","Tayugo"],
+    "Kalamansig": ["Bantogon","Cadiz","Datu Ito","Dumangas Nuevo","Hinalaan","Limulan","Nalus","Obial","Pag-asa","Palambuton","Poblacion","Santa Clara","Santa Maria","Sumilil","Tinumigues"],
+    "Lambayong": ["Ang-ilan","Baliango","Batang","Buenaflor","Bugso","Chua","Datu Wasay","Kalanawi","Kalandagan","Kapaya","Kibid","Kipav","Kisek","Kraan","Kulaman","Langgal","Mabuhay","Malandag","Mamali","Marbel","Morado","New Iloilo","Nopol","Pag-asa","Pamantingan","Poblacion"],
+    "Lebak": ["Aurelio F. Fresuena","Baas","Baganihan","Bago Inting","Banali","Basak","Bolebok","Calauan","Christiannuevo","Datu Kira","Kalamongay","Keladap","Kinodalan","Kulaman","Laguilayan","Luhong","Mabini","Maligaya","New Culasi","Pansud","Pasandalan","Poblacion","Poloy-Poloy","Purikay","Salaman","Taguisa","Tibpuan"],
+    "Lutayan": ["Antong","Bayasong","Blingkong","Bululawan","Colambutan","Datu Kilay","Kalutungan","Kapingkong","Lutayan Proper","Maindang","Pidsandawan"],
+    "Palimbang": ["Akol","Badiangon","Baliango","Balwan","Bambad","Baranayan","Batang-Baglas","Butril","Columbio","Datablao","Elbebe","Glamang","Gomek","Kalibuhan","Kiayap","Kolambog","Kraan","Kusan","Lagandang","Langgal","Libas","Luhong","Lumitan","Maganoy","Maguid","Malegdeg","Merbundo","Midtungok","Morado","Nuwog","Pag-asa","Pagalungan","Palimbang Proper","Pindak","Poblacion","Rangayen","Salman","Sambolawan","Sumbakil","Tinumigues"],
+    "President Quirino": ["Bagumbayan","Bannawag","Busok","Cedulian","Datu Aling","Datu Montawal","Kalumamis","Kangkong","Katatogan","Lanaptap","Maguindanao","Malegdeg","Mangadeg","Pedtad","Poblacion","Republican","Romualdez","San Jose","Tinumigues"],
+    "Senator Ninoy Aquino": ["Banali","Basag","Buenaflor","Dungan","Katanawan","Katitisan","Kiladap","Kulaman","Lambuda","Luhong","Maan","Malegdeg","Midtapok","Mudas","New Isabela","Pag-asa","Panadtaban","Poblacion","Saliao","Tinumigues"],
+    "Tacurong City": ["Baras","Buenaflor","Calean","D'Lotilla","EJC Montilla","Griño","Kakar","Lagao","Lower Katungal","New Isabela","New Lagao","Poblacion","San Antonio","San Emmanuel","San Pablo","San Rafael","Tina","Tinumigues","Upper Katungal","Rajah Nuda"]
+  },
+  "Sarangani": {
+    "Alabel": ["Alegria","Bagacay","Baluntay","Datal Anggas","Domolok","Kawas","Ladol","Maribulan","Pag-asa","Paraiso","Poblacion","Spring","Tokawal"],
+    "Glan": ["Baliton","Batulaki","Burias","Cablutan","Calabanit","Calpidong","Congan","Cross","Datalbukay","E. Alegado","Glan Padidu","Gumasa","Ilaya","Kaltuad","Kapatan","Lago","Laguimit","Lama","Lanton","Linan","Luhong","Lungib","Mahdalum","Muling","New Aklan","Pangyan","Poblacion","Rio Del Pilar","San Jose","San Vicente","Sufatubo"],
+    "Kiamba": ["Badtasan","Datu Diolat","Glan Padidu","Kling","Kraan","Lagundi","Lebe","Lomuyon","Luma","Mabila","Nali","Poblacion","Salakit","Satok","Siam","Sumbakil","Tambilil","Tinoto","Villafuerte"],
+    "Maasim": ["Amsipit","Bales","Colon","Daliao","Kabatiol","Kablacan","Kamanga","Kanalo","Lumasal","Luma","Malbang","Mati","Mualog","Poblacion","Salakit","Tinoto"],
+    "Maitum": ["Bati-Bati","Datu Baglas","Kalaneg","Kalaong","Kiamba","Kiayap","Labo","Lage","Mabila","Maguling","Malalag","Mana","Old Poblacion","Panlot","Pinol","Sallot","Sison","Tagaytay","Tuyan","Zion"],
+    "Malapatan": ["Daan Suyan","Duka","Kalaisan","Kinam","Libi","Lun Masla","Lun Padidu","Patag","Poblacion","Sapu Masla","Sapu Padidu","Tuyan"],
+    "Malungon": ["Alkikan","Ampon","Atlae","B'laan","Banahaw","Banate","Datal Batong","Datal Bila","Datal Tampal","Domangas","Kalaisan","Kinabalan","Kinabalian","Lamba","Lower Mainit","Maasin","Malandag","Malbang","Nomoh","Panamin","Poblacion","Sapu Masla","Sapu Padidu","Talus","Tamban","Upper Mainit","Alkikan II","Atlae II","Datal Anggas","Lun Masla","Malungon Gamay"]
+  },
+  "Cotabato City": {
+    "Cotabato City": ["Bagua I","Bagua II","Bagua III","Kalanganan I","Kalanganan II","Poblacion I","Poblacion II","Poblacion III","Poblacion IV","Poblacion V","Poblacion VI","Poblacion VII","Poblacion VIII","Poblacion IX","Rosary Heights I","Rosary Heights II","Rosary Heights III","Rosary Heights IV","Rosary Heights V","Rosary Heights VI","Rosary Heights VII","Rosary Heights VIII","Rosary Heights IX","Rosary Heights X","Rosary Heights XI","Rosary Heights XII","Rosary Heights XIII","PC Hill","RH I","RH II","RH III","RH IV","RH V","Tamontaka I","Tamontaka II","Tamontaka III","Tamontaka IV","Tamontaka V"]
+  },
+  "General Santos City": {
+    "General Santos City": ["Apopong","Baluan","Batomelong","Buayan","Bula","Calumpang","City Heights","Conel","Dadiangas East","Dadiangas North","Dadiangas South","Dadiangas West","Fatima","Katangawan","Labangal","Lagao","Ligaya","Mabuhay","Olympog","San Isidro","San Jose","Siguel","Sinawal","Tambler","Tinagacan","Upper Labay"]
+  }
+};
+
+// Populate province dropdown
+(function initProvince() {
+  const sel = document.getElementById('province');
+  Object.keys(addressData).sort().forEach(p => {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    sel.appendChild(o);
+  });
+})();
+
+function loadMunicipalities() {
+  const prov = document.getElementById('province').value;
+  const mSel = document.getElementById('municipality');
+  const bSel = document.getElementById('barangay');
+  mSel.innerHTML = '<option value="">— Select municipality —</option>';
+  bSel.innerHTML = '<option value="">— Select barangay —</option>';
+  bSel.disabled = true;
+  document.getElementById('addrPreview').classList.remove('show');
+  if (!prov) { mSel.disabled = true; return; }
+  Object.keys(addressData[prov]).sort().forEach(m => {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m;
+    mSel.appendChild(o);
+  });
+  mSel.disabled = false;
+  clearError('province');
+}
+
+function loadBarangays() {
+  const prov = document.getElementById('province').value;
+  const muni = document.getElementById('municipality').value;
+  const bSel = document.getElementById('barangay');
+  bSel.innerHTML = '<option value="">— Select barangay —</option>';
+  document.getElementById('addrPreview').classList.remove('show');
+  if (!prov || !muni) { bSel.disabled = true; return; }
+  addressData[prov][muni].slice().sort().forEach(b => {
+    const o = document.createElement('option');
+    o.value = b; o.textContent = b;
+    bSel.appendChild(o);
+  });
+  bSel.disabled = false;
+  clearError('municipality');
+}
+
+function updatePreview() {
+  const street = document.getElementById('street').value.trim();
+  const brgy = document.getElementById('barangay').value;
+  const muni = document.getElementById('municipality').value;
+  const prov = document.getElementById('province').value;
+  if (!brgy) return;
+  const parts = [street, 'Brgy. ' + brgy, muni, prov].filter(Boolean);
+  document.getElementById('addrText').textContent = parts.join(', ');
+  document.getElementById('addrPreview').classList.add('show');
+  clearError('barangay');
+}
+
+document.getElementById('street').addEventListener('input', () => {
+  if (document.getElementById('barangay').value) updatePreview();
+});
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+let currentStep = 0;
+
+function goNext(from) {
+  if (!validateStep(from)) return;
+  setStep(from + 1);
+  if (from + 1 === 3) buildReview();
+}
+
+function goBack(from) {
+  setStep(from - 1);
+}
+
+function setStep(n) {
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step' + currentStep).classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  document.querySelectorAll('.step').forEach((el, i) => {
+    el.classList.remove('active', 'done');
+    if (i < currentStep) el.classList.add('done');
+    else if (i === currentStep) el.classList.add('active');
+  });
+}
+
+// ============================================================
+// VALIDATION
+// ============================================================
+function validateStep(step) {
+  let ok = true;
+  if (step === 0) {
+    if (!v('lastName')) ok = false;
+    if (!v('firstName')) ok = false;
+    const sid = document.getElementById('schoolId').value.trim();
+    if (!sid || !/^\d+$/.test(sid)) { showError('schoolId'); ok = false; } else clearError('schoolId');
+    const mob = document.getElementById('mobile').value.trim();
+    if (!mob || !/^09\d{9}$/.test(mob)) { showError('mobile'); ok = false; } else clearError('mobile');
+    const em = document.getElementById('email').value.trim();
+    if (!em || !/@hccci\.edu\.ph$/i.test(em)) { showError('email'); ok = false; } else clearError('email');
+  }
+  if (step === 1) {
+    const sec = document.querySelector('input[name="section"]:checked');
+    if (!sec) { showError('section'); ok = false; } else clearError('section');
+  }
+  if (step === 2) {
+    if (!document.getElementById('province').value) { showError('province'); ok = false; } else clearError('province');
+    if (!document.getElementById('municipality').value) { showError('municipality'); ok = false; } else clearError('municipality');
+    if (!document.getElementById('barangay').value) { showError('barangay'); ok = false; } else clearError('barangay');
+  }
+  if (!ok) showToast('Please fill in all required fields.');
+  return ok;
+}
+
+function v(id) {
+  const val = document.getElementById(id).value.trim();
+  if (!val) { showError(id); return false; }
+  clearError(id); return true;
+}
+function showError(id) {
+  const el = document.getElementById(id) || document.querySelector('[name="' + id + '"]');
+  if (el) el.classList ? el.classList.add('error') : null;
+  const err = document.getElementById('err-' + id);
+  if (err) err.classList.add('show');
+}
+function clearError(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('error');
+  const err = document.getElementById('err-' + id);
+  if (err) err.classList.remove('show');
+}
+
+// ============================================================
+// REVIEW
+// ============================================================
+function buildReview() {
+  const section = document.querySelector('input[name="section"]:checked');
+  const street = document.getElementById('street').value.trim();
+  const brgy = document.getElementById('barangay').value;
+  const muni = document.getElementById('municipality').value;
+  const prov = document.getElementById('province').value;
+  const addr = [street, 'Brgy. ' + brgy, muni, prov].filter(Boolean).join(', ');
+
+  document.getElementById('reviewPersonal').innerHTML = [
+    ['Full Name', document.getElementById('firstName').value + ' ' + (document.getElementById('middleName').value ? document.getElementById('middleName').value + ' ' : '') + document.getElementById('lastName').value],
+    ['School ID', document.getElementById('schoolId').value],
+    ['Mobile', document.getElementById('mobile').value],
+    ['Email', document.getElementById('email').value],
+  ].map(([k,v]) => `<div class="review-item"><span class="review-key">${k}</span><span class="review-val">${v}</span></div>`).join('');
+
+  document.getElementById('reviewAcademic').innerHTML = `<div class="review-item"><span class="review-key">Section</span><span class="review-val">${section ? section.value : '—'}</span></div>`;
+
+  document.getElementById('reviewAddress').innerHTML = `<div class="review-item"><span class="review-key">Full Address</span><span class="review-val" style="max-width:300px;">${addr}</span></div>`;
+}
+
+// ============================================================
+// SUBMISSION
+// ============================================================
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const section = document.querySelector('input[name="section"]:checked');
+  const street = document.getElementById('street').value.trim();
+  const brgy = document.getElementById('barangay').value;
+  const muni = document.getElementById('municipality').value;
+
+  const prov = document.getElementById('province').value;
+
+  const data = {
+    timestamp: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
+    schoolId: document.getElementById('schoolId').value.trim(),
+    lastName: document.getElementById('lastName').value.trim(),
+    firstName: document.getElementById('firstName').value.trim(),
+    middleName: document.getElementById('middleName').value.trim(),
+    mobile: document.getElementById('mobile').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    section: section ? section.value : '',
+    street: street,
+    barangay: brgy,
+    municipality: muni,
+    province: prov,
+    fullAddress: [street, 'Brgy. ' + brgy, muni, prov].filter(Boolean).join(', ')
+  };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    // no-cors means we can't read response, assume success
+    document.getElementById('step3').classList.remove('active');
+    document.getElementById('successScreen').classList.add('show');
+    updateProgress();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = '✓  Submit PSITS Registration';
+    showToast('Submission failed. Please try again.');
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
