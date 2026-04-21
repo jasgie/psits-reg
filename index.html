@@ -377,6 +377,40 @@
     color: var(--text); margin-bottom: 0.5rem;
   }
   .success-screen p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .success-name {
+    margin: 1.25rem auto 0.85rem;
+    max-width: 440px;
+    text-align: left;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .success-name strong {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .success-name span {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .success-note {
+    margin: 0 auto;
+    max-width: 440px;
+    text-align: left;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #9a3412;
+    line-height: 1.5;
+  }
 
   /* Error message */
   .err-msg {
@@ -456,6 +490,13 @@
     <h2>Registration Submitted!</h2>
     <p>Thank you for registering as a PSITS member.<br>Your information has been recorded successfully.<br><br>
     <span style="color:var(--accent);font-weight:500;">You may now close this page.</span></p>
+    <div class="success-name">
+      <strong>Name</strong>
+      <span id="successName">—</span>
+    </div>
+    <div class="success-note">
+      Please screenshot this confirmation and show it during signing of clearance for the PSITS club.
+    </div>
   </div>
 
   <!-- STEP 1: Personal Info -->
@@ -550,8 +591,9 @@
     <div class="card">
       <div class="card-title">Street / Purok</div>
       <div class="field">
-        <label>Purok / Street / House No. <span class="hint">(optional)</span></label>
-        <input type="text" id="street" placeholder="e.g. Purok 3, Blk 2 Lot 5">
+        <label>Purok / Street / House No. <span class="req">*</span></label>
+        <input type="text" id="street" placeholder="e.g. Purok 3, Blk 2 Lot 5" required>
+        <div class="err-msg" id="err-street">Required</div>
       </div>
     </div>
 
@@ -758,6 +800,23 @@ document.getElementById('street').addEventListener('input', () => {
   if (document.getElementById('barangay').value) updatePreview();
 });
 
+function toSentenceCase(value) {
+  return value
+    .toLowerCase()
+    .replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g, s => s.toUpperCase());
+}
+
+document.querySelectorAll('input:not([type="email"])').forEach(input => {
+  input.addEventListener('input', () => {
+    const transformed = toSentenceCase(input.value);
+    if (input.value !== transformed) {
+      const cursorPos = input.selectionStart;
+      input.value = transformed;
+      if (cursorPos !== null) input.setSelectionRange(cursorPos, cursorPos);
+    }
+  });
+});
+
 // ============================================================
 // NAVIGATION
 // ============================================================
@@ -809,6 +868,7 @@ function validateStep(step) {
     if (!sec) { showError('section'); ok = false; } else clearError('section');
   }
   if (step === 2) {
+    if (!v('street')) ok = false;
     if (!document.getElementById('province').value) { showError('province'); ok = false; } else clearError('province');
     if (!document.getElementById('municipality').value) { showError('municipality'); ok = false; } else clearError('municipality');
     if (!document.getElementById('barangay').value) { showError('barangay'); ok = false; } else clearError('barangay');
@@ -872,13 +932,17 @@ async function submitForm() {
   const muni = document.getElementById('municipality').value;
 
   const prov = document.getElementById('province').value;
+  const firstName = document.getElementById('firstName').value.trim();
+  const middleName = document.getElementById('middleName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const submittedName = [firstName, middleName, lastName].filter(Boolean).join(' ');
 
   const data = {
     timestamp: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
     schoolId: document.getElementById('schoolId').value.trim(),
-    lastName: document.getElementById('lastName').value.trim(),
-    firstName: document.getElementById('firstName').value.trim(),
-    middleName: document.getElementById('middleName').value.trim(),
+    lastName: lastName,
+    firstName: firstName,
+    middleName: middleName,
     mobile: document.getElementById('mobile').value.trim(),
     email: document.getElementById('email').value.trim(),
     section: section ? section.value : '',
@@ -897,6 +961,7 @@ async function submitForm() {
       body: JSON.stringify(data)
     });
     // no-cors means we can't read response, assume success
+    document.getElementById('successName').textContent = submittedName || '—';
     document.getElementById('step3').classList.remove('active');
     document.getElementById('successScreen').classList.add('show');
     updateProgress();
