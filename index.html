@@ -593,7 +593,7 @@
       <div class="field">
         <label>Purok / Street / House No. <span class="req">*</span></label>
         <input type="text" id="street" placeholder="e.g. Purok 3, Blk 2 Lot 5" required>
-        <div class="err-msg" id="err-street">Required</div>
+        <div class="err-msg" id="err-street">Enter only the purok, street, zone, or house number</div>
       </div>
     </div>
 
@@ -789,7 +789,10 @@ function updatePreview() {
   const brgy = document.getElementById('barangay').value;
   const muni = document.getElementById('municipality').value;
   const prov = document.getElementById('province').value;
-  if (!brgy) return;
+  if (!brgy || !validateStreetField(true)) {
+    document.getElementById('addrPreview').classList.remove('show');
+    return;
+  }
   const parts = [street, 'Brgy. ' + brgy, muni, prov].filter(Boolean);
   document.getElementById('addrText').textContent = parts.join(', ');
   document.getElementById('addrPreview').classList.add('show');
@@ -797,8 +800,48 @@ function updatePreview() {
 }
 
 document.getElementById('street').addEventListener('input', () => {
+  validateStreetField(true);
   if (document.getElementById('barangay').value) updatePreview();
 });
+
+function normalizeAddressPart(value) {
+  return value
+    .toLowerCase()
+    .replace(/\b(barangay|brgy\.?|municipality|munisipyo|city)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function validateStreetField(isLiveCheck = false) {
+  const streetInput = document.getElementById('street');
+  const value = streetInput.value.trim();
+  const municipality = document.getElementById('municipality').value;
+  const barangay = document.getElementById('barangay').value;
+  const normalizedStreet = normalizeAddressPart(value);
+  const normalizedMunicipality = normalizeAddressPart(municipality);
+  const normalizedBarangay = normalizeAddressPart(barangay);
+  const hasLocationName = Boolean(
+    normalizedStreet && (
+      (normalizedMunicipality && normalizedStreet.includes(normalizedMunicipality)) ||
+      (normalizedBarangay && normalizedStreet.includes(normalizedBarangay))
+    )
+  );
+  const hasLocationKeyword = /\b(barangay|brgy\.?|municipality|munisipyo)\b/i.test(value);
+
+  if (!value) {
+    if (!isLiveCheck) showError('street', 'Required');
+    else clearError('street');
+    return false;
+  }
+
+  if (hasLocationName || hasLocationKeyword) {
+    showError('street', 'Enter only the purok, street, zone, or house number here');
+    return false;
+  }
+
+  clearError('street');
+  return true;
+}
 
 function toSentenceCase(value) {
   return value
@@ -868,12 +911,17 @@ function validateStep(step) {
     if (!sec) { showError('section'); ok = false; } else clearError('section');
   }
   if (step === 2) {
-    if (!v('street')) ok = false;
+    const streetOk = validateStreetField();
+    if (!streetOk) ok = false;
     if (!document.getElementById('province').value) { showError('province'); ok = false; } else clearError('province');
     if (!document.getElementById('municipality').value) { showError('municipality'); ok = false; } else clearError('municipality');
     if (!document.getElementById('barangay').value) { showError('barangay'); ok = false; } else clearError('barangay');
   }
-  if (!ok) showToast('Please fill in all required fields.');
+  if (!ok) {
+    showToast(step === 2 && document.getElementById('street').classList.contains('error')
+      ? 'Enter only the purok, street, or zone in the first address field.'
+      : 'Please fill in all required fields.');
+  }
   return ok;
 }
 
@@ -882,11 +930,14 @@ function v(id) {
   if (!val) { showError(id); return false; }
   clearError(id); return true;
 }
-function showError(id) {
+function showError(id, message) {
   const el = document.getElementById(id) || document.querySelector('[name="' + id + '"]');
   if (el) el.classList ? el.classList.add('error') : null;
   const err = document.getElementById('err-' + id);
-  if (err) err.classList.add('show');
+  if (err) {
+    if (message) err.textContent = message;
+    err.classList.add('show');
+  }
 }
 function clearError(id) {
   const el = document.getElementById(id);
