@@ -740,6 +740,34 @@ const addressData = {
   }
 };
 
+const knownLocationNames = buildKnownLocationNames(addressData);
+
+function buildKnownLocationNames(data) {
+  const names = new Set();
+
+  Object.keys(data).forEach(province => {
+    const normalizedProvince = normalizeAddressPart(province);
+    if (normalizedProvince) names.add(normalizedProvince);
+
+    // Also index names without parenthetical aliases, e.g. "Cotabato (North Cotabato)".
+    const withoutParen = province.replace(/\([^)]*\)/g, ' ').trim();
+    const normalizedWithoutParen = normalizeAddressPart(withoutParen);
+    if (normalizedWithoutParen) names.add(normalizedWithoutParen);
+
+    Object.keys(data[province]).forEach(municipality => {
+      const normalizedMunicipality = normalizeAddressPart(municipality);
+      if (normalizedMunicipality) names.add(normalizedMunicipality);
+    });
+  });
+
+  return Array.from(names).sort((a, b) => b.length - a.length);
+}
+
+function streetContainsKnownLocation(value) {
+  if (!value) return false;
+  return knownLocationNames.some(name => name.length >= 4 && value.includes(name));
+}
+
 // Populate province dropdown
 (function initProvince() {
   const sel = document.getElementById('province');
@@ -807,7 +835,7 @@ document.getElementById('street').addEventListener('input', () => {
 function normalizeAddressPart(value) {
   return value
     .toLowerCase()
-    .replace(/\b(barangay|brgy\.?|municipality|munisipyo|city)\b/g, ' ')
+    .replace(/\b(barangay|brgy\.?|municipality|munisipyo|province|probinsya)\b/g, ' ')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 }
@@ -826,7 +854,8 @@ function validateStreetField(isLiveCheck = false) {
       (normalizedBarangay && normalizedStreet.includes(normalizedBarangay))
     )
   );
-  const hasLocationKeyword = /\b(barangay|brgy\.?|municipality|munisipyo)\b/i.test(value);
+  const hasLocationKeyword = /\b(barangay|brgy\.?|municipality|munisipyo|province|probinsya)\b/i.test(value);
+  const hasKnownLocationName = streetContainsKnownLocation(normalizedStreet);
 
   if (!value) {
     if (!isLiveCheck) showError('street', 'Required');
@@ -834,8 +863,8 @@ function validateStreetField(isLiveCheck = false) {
     return false;
   }
 
-  if (hasLocationName || hasLocationKeyword) {
-    showError('street', 'Enter only the purok, street, zone, or house number here');
+  if (hasLocationName || hasLocationKeyword || hasKnownLocationName) {
+    showError('street', 'Do not include barangay, municipality, or province here. Enter only purok, street, zone, or house number.');
     return false;
   }
 
